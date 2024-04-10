@@ -15,8 +15,6 @@ const signUpProps = z.object({
   password: z.string().min(1).max(256)
 });
 
-type SignupParams = z.infer<typeof signUpProps>;
-
 router.post("/signup", async (req, res) => {
   const parsedInput = signUpProps.safeParse(req.body);
   if (!parsedInput.success) {
