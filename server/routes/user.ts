@@ -20,13 +20,13 @@ type SignupParams = z.infer<typeof signUpProps>;
 router.post("/signup", async (req, res) => {
   const parsedInput = signUpProps.safeParse(req.body);
   if (!parsedInput.success) {
-    return res.status(411).json({msg: parsedInput.error })
+    return res.status(400).json({msg: parsedInput.error })
   }
   const { username, password } = parsedInput.data;
   const user = await User.findOne({ username });
 
   if (user) {
-    res.status(400).send("user already exists, try another username !");
+    res.status(409).send("user already exists, try another username !");
     return;
   }
 
@@ -54,13 +54,13 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.headers;
   const parsedInput = loginProps.safeParse({username, password});
   if (!parsedInput.success) {
-    return res.status(411).json({msg: parsedInput.error});
+    return res.status(400).json({msg: parsedInput.error});
   }
 
   let found = await User.findOne({ username, password });
 
   if (!found)
-    return res.status(400).send({ message: "username or password not found" });
+    return res.status(401).send({ message: "username or password not found" });
 
     const token = jwt.sign(
       {

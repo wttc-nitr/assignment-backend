@@ -28,12 +28,12 @@ const signUpProps = zod_1.z.object({
 router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parsedInput = signUpProps.safeParse(req.body);
     if (!parsedInput.success) {
-        return res.status(411).json({ msg: parsedInput.error });
+        return res.status(400).json({ msg: parsedInput.error });
     }
     const { username, password } = parsedInput.data;
     const user = yield db_1.User.findOne({ username });
     if (user) {
-        res.status(400).send("user already exists, try another username !");
+        res.status(409).send("user already exists, try another username !");
         return;
     }
     // new User({username: username, password: password})
@@ -52,11 +52,11 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { username, password } = req.headers;
     const parsedInput = loginProps.safeParse({ username, password });
     if (!parsedInput.success) {
-        return res.status(411).json({ msg: parsedInput.error });
+        return res.status(400).json({ msg: parsedInput.error });
     }
     let found = yield db_1.User.findOne({ username, password });
     if (!found)
-        return res.status(400).send({ message: "username or password not found" });
+        return res.status(401).send({ message: "username or password not found" });
     const token = jsonwebtoken_1.default.sign({
         username
     }, "secret", { expiresIn: "1h" });
